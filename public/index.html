@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/" class="navbar-brand">📚 Library System</a>
+                <ul class="navbar-nav">
+                    <li><a href="#" class="nav-link">Books</a></li>
+                    <li><a href="#" class="nav-link">My Loans</a></li>
+                    <li><a href="#" class="nav-link">Reservations</a></li>
+                    <li><a href="#" class="nav-link">Profile</a></li>
+                    <li><a href="#" class="nav-link">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="hero">
+                <h1>Welcome to Library Management System</h1>
+                <p>Discover, Borrow, and Review Books - All in One Place</p>
+            </div>
+
+            <div class="sidebar">
+                <aside class="sidebar-left">
+                    <div class="card">
+                        <h3>Search Books</h3>
+                        <form id="searchForm" style="margin-top: 1rem;">
+                            <input type="text" id="searchInput" placeholder="Search by title, ISBN..." style="margin-bottom: 0.5rem;">
+                            <select id="categoryFilter" style="margin-bottom: 0.5rem;">
+                                <option value="">All Categories</option>
+                                <option value="1">Fiction</option>
+                                <option value="2">Science</option>
+                                <option value="3">History</option>
+                                <option value="4">Technology</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Search</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>Quick Stats</h3>
+                        <div style="margin-top: 1rem;">
+                            <p><strong>Total Books:</strong> <span id="totalBooks">-</span></p>
+                            <p><strong>Available:</strong> <span id="availableBooks">-</span></p>
+                            <p><strong>My Active Loans:</strong> <span id="activeLoans">-</span></p>
+                        </div>
+                    </div>
+                </aside>
+
+                <section class="sidebar-content">
+                    <h2>Featured Books</h2>
+                    <div id="booksContainer" class="grid">
+                        <div class="card" style="grid-column: 1 / -1; text-align: center;">
+                            <p>Loading books...</p>
+                        </div>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer style="background-color: var(--primary-color); color: white; text-align: center; padding: 2rem 0; margin-top: 3rem;">
+        <p>&copy; 2026 Library Management System. All rights reserved.</p>
+    </footer>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
