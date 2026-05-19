@@ -2,41 +2,45 @@
 
 namespace LibrarySystem\Controllers;
 
-use LibrarySystem\Core\Database;
 use LibrarySystem\Models\Loan;
 
 class LoanController {
     private Loan $loanModel;
 
-    public function __construct(Database $db) {
-        $this->loanModel = new Loan($db);
+    public function __construct(Loan $loanModel) {
+        $this->loanModel = $loanModel;
     }
 
     public function create() {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $result = $this->loanModel->create($data['book_id'], $data['user_id'], $data['due_days'] ?? 14);
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (empty($input['book_id']) || empty($input['user_id'])) {
+            http_response_code(400);
+            return json_encode(['success' => false, 'message' => 'Missing required fields']);
+        }
+
+        $result = $this->loanModel->create($input['book_id'], $input['user_id']);
         return json_encode($result);
     }
 
-    public function returnBook() {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $result = $this->loanModel->returnBook($data['loan_id']);
+    public function returnBook($id) {
+        $result = $this->loanModel->returnBook($id);
         return json_encode($result);
     }
 
     public function getActive($userId) {
         $loans = $this->loanModel->getActive($userId);
-        return json_encode(['data' => $loans]);
+        return json_encode(['success' => true, 'data' => $loans]);
     }
 
-    public function getHistory($userId, $page = 1) {
-        $history = $this->loanModel->getHistory($userId, $page);
-        return json_encode($history);
+    public function getHistory($userId) {
+        $page = $_GET['page'] ?? 1;
+        $result = $this->loanModel->getHistory($userId, $page);
+        return json_encode(['success' => true, 'data' => $result]);
     }
 
-    public function renew() {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $result = $this->loanModel->renew($data['loan_id'], $data['due_days'] ?? 14);
+    public function renew($id) {
+        $result = $this->loanModel->renew($id);
         return json_encode($result);
     }
 }

@@ -3,54 +3,63 @@
 namespace LibrarySystem\Controllers;
 
 use LibrarySystem\Core\Auth;
+use LibrarySystem\Models\User;
 
 class AuthController {
     private Auth $auth;
+    private User $userModel;
 
-    public function __construct(Auth $auth) {
+    public function __construct(Auth $auth, User $userModel) {
         $this->auth = $auth;
+        $this->userModel = $userModel;
     }
 
-    public function register(): void {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->jsonResponse(['error' => 'Method not allowed'], 405);
-            return;
+    public function register() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (empty($input['username']) || empty($input['email']) || empty($input['password'])) {
+            http_response_code(400);
+            return json_encode(['success' => false, 'message' => 'Missing required fields']);
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
         $result = $this->auth->register(
-            $data['username'] ?? '',
-            $data['email'] ?? '',
-            $data['password'] ?? '',
-            $data['first_name'] ?? '',
-            $data['last_name'] ?? ''
+            $input['username'],
+            $input['email'],
+            $input['password'],
+            $input['first_name'] ?? '',
+            $input['last_name'] ?? ''
         );
-
-        $this->jsonResponse($result, $result['success'] ? 201 : 400);
+        
+        return json_encode($result);
     }
 
-    public function login(): void {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->jsonResponse(['error' => 'Method not allowed'], 405);
-            return;
+    public function login() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (empty($input['email']) || empty($input['password'])) {
+            http_response_code(400);
+            return json_encode(['success' => false, 'message' => 'Missing credentials']);
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
-        $result = $this->auth->login(
-            $data['email'] ?? '',
-            $data['password'] ?? ''
-        );
-
-        $this->jsonResponse($result, $result['success'] ? 200 : 401);
+        $result = $this->auth->login($input['email'], $input['password']);
+        return json_encode($result);
     }
 
-    public function logout(): void {
-        $this->jsonResponse(['message' => 'Logged out successfully'], 200);
-    }
+    public function verify() {
+        $headers = getallheaders();
+        $token = str_replace('Bearer ', '', $headers['Authorization'] ?? '');
+        
+        if (empty($token)) {
+            http_response_code(401);
+            return json_encode(['success' => false, 'message' => 'Token not provided']);
+        }
 
-    private function jsonResponse($data, $status = 200): void {
-        http_response_code($status);
-        header('Content-Type: application/json');
-        echo json_encode($data);
+        $payload = $this->auth->verifyToken($token);
+        if (!$payload) {
+            http_response_code(401);
+            return json_encode(['success' => false, 'message' => 'Invalid token']);
+        }
+
+        return json_encode(['success' => true, 'user' => $payload]);
     }
 }
